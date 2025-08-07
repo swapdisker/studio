@@ -46,12 +46,12 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
 
           <Separator />
 
-          <div className="flex flex-col items-center">
+          <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={date}
               onSelect={setDate}
-              className="rounded-md border p-0 w-full"
+              className="rounded-md border"
             />
           </div>
 
