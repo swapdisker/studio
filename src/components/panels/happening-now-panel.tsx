@@ -51,7 +51,7 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
               mode="single"
               selected={date}
               onSelect={setDate}
-              className="rounded-md border p-0"
+              className="rounded-md border p-0 w-full"
             />
           </div>
 

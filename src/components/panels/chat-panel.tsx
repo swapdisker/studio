@@ -86,7 +86,7 @@ const ChatPanel = ({ onSelectDestination }: ChatPanelProps) => {
               <h2 className="text-2xl font-headline font-semibold">How can I help you today?</h2>
               <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
                 {quickPrompts.map((prompt) => (
-                  <Button key={prompt} variant="outline" className="font-body h-auto py-3" onClick={() => handleSendMessage(prompt)}>
+                  <Button key={prompt} variant="outline" className="font-body h-auto py-3 whitespace-normal justify-center text-center" onClick={() => handleSendMessage(prompt)}>
                     {prompt}
                   </Button>
                 ))}
