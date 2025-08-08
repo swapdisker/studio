@@ -8,6 +8,7 @@ import ChatPanel from '@/components/panels/chat-panel';
 import Header from '@/components/layout/header';
 import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 import { useToast } from '@/hooks/use-toast';
+import { vibes } from '@/components/common/vibe-status';
 
 export interface Destination {
   id: number;
@@ -50,6 +51,7 @@ const WanderWiseClient: FC = () => {
   const [selectedDestination, setSelectedDestination] = useState<GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null>(null);
   const [location, setLocation] = useState<Location | null>(null);
   const [currentVibe, setCurrentVibe] = useState('Relaxed');
+  const [animationClass, setAnimationClass] = useState('');
   const { toast } = useToast();
 
   useEffect(() => {
@@ -67,7 +69,6 @@ const WanderWiseClient: FC = () => {
           };
           setLocation(newLocation);
           
-          // Eagerly fetch city from a simple query.
           generatePersonalizedRecommendations({
             query: "What city is this?",
             latitude: newLocation.latitude,
@@ -123,23 +124,39 @@ const WanderWiseClient: FC = () => {
         setSelectedDestination(recommendation);
     }
   };
+
+  const handleVibeChange = (newVibe: string) => {
+    setCurrentVibe(newVibe);
+    const vibeDetails = vibes.find(v => v.name === newVibe);
+    if (vibeDetails) {
+        const colorHsl = getComputedStyle(document.documentElement).getPropertyValue(`--chart-${vibeDetails.color.match(/(\d+)/)?.[0] || '1'}`).trim();
+        document.documentElement.style.setProperty('--vibe-wave-color', `hsl(${colorHsl})`);
+    }
+
+    setAnimationClass('vibe-wave-active');
+    setTimeout(() => {
+        setAnimationClass('');
+    }, 700);
+  }
   
   return (
-    <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
+    <div id="root-container" className={`flex flex-col h-screen bg-background text-foreground overflow-hidden ${animationClass}`}>
       <main className="grid grid-cols-[auto,auto,1fr] flex-1 overflow-hidden p-4 gap-4">
         <div className="row-span-2">
           <HappeningNowPanel 
             onSelectDestination={handleSelectMockDestination} 
             currentVibe={currentVibe}
-            onVibeChange={setCurrentVibe}
+            onVibeChange={handleVibeChange}
           />
         </div>
         <div className={`row-span-2 transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
         <div className="col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border">
-          <Header location={location} />
-          <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} vibe={currentVibe} />
+            <Header location={location} />
+            <div className="flex-1 flex flex-col overflow-hidden">
+                <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} vibe={currentVibe} />
+            </div>
         </div>
       </main>
     </div>

@@ -8,7 +8,7 @@ import { interpretVibeStatus } from '@/ai/flows/interpret-vibe-status';
 import { Sparkles, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const vibes = [
+export const vibes = [
     { name: 'Energetic', color: 'bg-[hsl(var(--chart-1))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-1))]' },
     { name: 'Relaxed', color: 'bg-[hsl(var(--chart-2))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-2))]' },
     { name: 'Adventurous', color: 'bg-[hsl(var(--chart-5))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-5))]' },
