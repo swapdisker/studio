@@ -9,12 +9,12 @@ import { Sparkles, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const vibes = [
-    { name: 'Energetic', color: 'bg-[hsl(var(--chart-1))]' },
-    { name: 'Relaxed', color: 'bg-[hsl(var(--chart-2))]' },
-    { name: 'Adventurous', color: 'bg-[hsl(var(--chart-5))]' },
-    { name: 'Creative', color: 'bg-[hsl(var(--chart-4))]' },
-    { name: 'Social', color: 'bg-[hsl(var(--primary))]' },
-    { name: 'Cozy', color: 'bg-[hsl(var(--secondary))]' },
+    { name: 'Energetic', color: 'bg-[hsl(var(--chart-1))]', textColor: 'text-white' },
+    { name: 'Relaxed', color: 'bg-[hsl(var(--chart-2))]', textColor: 'text-white' },
+    { name: 'Adventurous', color: 'bg-[hsl(var(--chart-5))]', textColor: 'text-white' },
+    { name: 'Creative', color: 'bg-[hsl(var(--chart-4))]', textColor: 'text-black' },
+    { name: 'Social', color: 'bg-[hsl(var(--primary))]', textColor: 'text-white' },
+    { name: 'Cozy', color: 'bg-[hsl(var(--secondary))]', textColor: 'text-black' },
 ];
 
 const VibeStatus = () => {
@@ -46,11 +46,19 @@ const VibeStatus = () => {
       });
     }
   };
+  
+  const selectedVibe = vibes.find(v => v.name === currentVibe);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-full justify-start font-normal text-base py-6">
+        <Button 
+            variant="outline" 
+            className={cn(
+                "w-full justify-start font-normal text-base py-6",
+                selectedVibe ? `${selectedVibe.color} ${selectedVibe.textColor} hover:${selectedVibe.color}/90 focus:${selectedVibe.color}` : ""
+            )}
+        >
           <Sparkles className="mr-2 h-4 w-4" />
           Vibe Status: {currentVibe}
         </Button>
@@ -65,10 +73,7 @@ const VibeStatus = () => {
                         variant="ghost" 
                         className={cn(
                             "flex-1 justify-start", 
-                            currentVibe === vibe.name 
-                                ? `${vibe.color} text-white hover:${vibe.color}/90`
-                                : "bg-transparent",
-                             vibe.name === 'Cozy' ? 'text-black' : 'text-white' //
+                            currentVibe === vibe.name && `${vibe.color} ${vibe.textColor} hover:${vibe.color}/90`,
                         )}
                         onClick={() => handleSelectVibe(vibe.name)}
                     >
