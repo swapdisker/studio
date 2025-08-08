@@ -95,7 +95,7 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
               <div className="p-4 bg-primary/10 rounded-full mb-4">
                 <BrainCircuit className="w-12 h-12 text-primary" />
               </div>
-              <h2 className="text-2xl font-headline font-semibold">How can I help you today?</h2>
+              <h2 className="text-2xl font-headline font-semibold">Where do you want to go?</h2>
               <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
                 {quickPrompts.map((prompt) => (
                   <Button key={prompt} variant="outline" className="h-auto whitespace-normal py-3 justify-center text-center font-body" onClick={() => handleSendMessage(prompt)}>
