@@ -9,6 +9,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import { getEventbriteEvents } from '../tools/eventbrite';
 
 const GeneratePersonalizedRecommendationsInputSchema = z.object({
   query: z.string().describe('The user\'s request for recommendations.'),
@@ -32,7 +33,8 @@ const prompt = ai.definePrompt({
 
 The user's request is: {{{query}}}
 
-Based on the user's request, provide a list of personalized recommendations for nearby activities and places. Be concise and provide a variety of options.`,
+Based on the user's request, provide a list of personalized recommendations for nearby activities and places. Be concise and provide a variety of options. Use the available tools to find real events and venues.`,
+  tools: [getEventbriteEvents],
 });
 
 const generatePersonalizedRecommendationsFlow = ai.defineFlow(
