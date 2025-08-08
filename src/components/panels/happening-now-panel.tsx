@@ -5,13 +5,54 @@ import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import VibeStatus from '@/components/common/vibe-status';
 import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import CalendarEventsPopover from '@/components/common/calendar-events-popover';
 
 interface HappeningNowPanelProps {
   onSelectDestination: (id: number) => void;
 }
 
+const mockEvents = {
+  "2024-07-29": [{ time: "10:00 AM", title: "Team Standup" }, { time: "2:00 PM", title: "Design Review" }],
+  "2024-07-30": [],
+  "2024-08-01": [{ time: "11:00 AM", title: "Lunch with Sarah" }],
+  "2024-08-05": [
+    { time: "9:00 AM", title: "Project Kickoff" },
+    { time: "1:00 PM", title: "User Interview" },
+    { time: "4:00 PM", title: "Sync with Marketing" },
+    { time: "6:00 PM", title: "Yoga Class" }
+  ],
+  "2024-08-15": [{ time: "All Day", title: "Company Offsite" }],
+};
+
+const getEventCountForDate = (date: Date) => {
+    const dateString = date.toISOString().split('T')[0];
+    return mockEvents[dateString]?.length || 0;
+}
+
 const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
+    const [popoverOpen, setPopoverOpen] = useState(false);
+    const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
+
+    const handleDayClick = (day: Date) => {
+        setSelectedDay(day);
+        setPopoverOpen(true);
+    };
+
+    const modifiers = {
+        busy: (date: Date) => getEventCountForDate(date) > 2,
+        some: (date: Date) => getEventCountForDate(date) > 0 && getEventCountForDate(date) <= 2,
+        free: (date: Date) => getEventCountForDate(date) === 0,
+    };
+
+    const modifiersStyles = {
+        busy: { backgroundColor: '#FF6B6B', color: 'white' },
+        some: { backgroundColor: '#FFD166' },
+        free: { backgroundColor: '#90EE90' },
+    };
+
+
   return (
     <div className="w-96 flex-shrink-0 flex flex-col gap-4">
       <Card className="flex-grow flex flex-col">
@@ -47,12 +88,24 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
           <Separator />
 
           <div className="flex justify-center">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={setDate}
-              className="rounded-md border"
-            />
+            <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+                <PopoverTrigger asChild>
+                    <div className="w-full">
+                        <Calendar
+                            mode="single"
+                            selected={date}
+                            onSelect={setDate}
+                            onDayClick={handleDayClick}
+                            className="rounded-md border w-full"
+                            modifiers={modifiers}
+                            modifiersStyles={modifiersStyles}
+                        />
+                    </div>
+                </PopoverTrigger>
+                <PopoverContent className="w-80">
+                    <CalendarEventsPopover date={selectedDay} events={mockEvents[selectedDay?.toISOString().split('T')[0] || ''] || []} />
+                </PopoverContent>
+            </Popover>
           </div>
 
           <Separator />
