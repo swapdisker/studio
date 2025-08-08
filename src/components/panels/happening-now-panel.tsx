@@ -11,9 +11,11 @@ import { getCalendlyEvents, CalendlyEvent } from '@/ai/tools/calendly';
 
 interface HappeningNowPanelProps {
   onSelectDestination: (id: number) => void;
+  currentVibe: string;
+  onVibeChange: (vibe: string) => void;
 }
 
-const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
+const HappeningNowPanel = ({ onSelectDestination, currentVibe, onVibeChange }: HappeningNowPanelProps) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
@@ -131,7 +133,7 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
           </div>
 
           <div className="mt-auto pt-2">
-            <VibeStatus />
+            <VibeStatus currentVibe={currentVibe} onVibeChange={onVibeChange} />
           </div>
         </CardContent>
       </Card>

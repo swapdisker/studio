@@ -8,31 +8,29 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CornerDownLeft, Bot, User, Coffee } from 'lucide-react';
 import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
+import { generateQuickPrompts } from '@/ai/flows/generate-quick-prompts';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
 import type { Location } from '@/app/wander-wise-client';
+import { Skeleton } from '../ui/skeleton';
 
 type Message = {
   role: 'user' | 'assistant';
   content: string;
 };
 
-const quickPrompts = [
-  "Find a quiet coffee shop nearby",
-  "Any live music events tonight?",
-  "Suggest a good place for a first date",
-  "What are some family-friendly activities?",
-];
-
 interface ChatPanelProps {
   onNewRecommendation: (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null, city?: string) => void;
   location: Location | null;
+  vibe: string;
 }
 
-const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
+const ChatPanel = ({ onNewRecommendation, location, vibe }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [quickPrompts, setQuickPrompts] = useState<string[]>([]);
+  const [arePromptsLoading, setArePromptsLoading] = useState(true);
   const { toast } = useToast();
   const scrollViewportRef = useRef<HTMLDivElement>(null);
 
@@ -41,6 +39,27 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
         scrollViewportRef.current.scrollTop = scrollViewportRef.current.scrollHeight;
     }
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    async function fetchQuickPrompts() {
+      setArePromptsLoading(true);
+      try {
+        const result = await generateQuickPrompts({ vibe });
+        setQuickPrompts(result.prompts);
+      } catch (error) {
+        console.error("Failed to generate quick prompts", error);
+        setQuickPrompts([
+          "Find a quiet coffee shop nearby",
+          "Any live music events tonight?",
+          "Suggest a good place for a first date",
+          "What are some family-friendly activities?",
+        ]);
+      } finally {
+        setArePromptsLoading(false);
+      }
+    }
+    fetchQuickPrompts();
+  }, [vibe]);
 
   const handleSendMessage = async (prompt?: string) => {
     const userMessage = prompt || input;
@@ -85,6 +104,14 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
     e.preventDefault();
     handleSendMessage();
   };
+  
+  const QuickPromptSkeleton = () => (
+    <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
+      {Array.from({ length: 4 }).map((_, i) => (
+         <Skeleton key={i} className="h-[58px] whitespace-normal py-3 justify-center text-center font-body" />
+      ))}
+    </div>
+  );
 
   return (
     <Card className="flex-1 flex flex-col h-full rounded-none border-none shadow-none bg-transparent overflow-hidden">
@@ -96,13 +123,15 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
                 <Coffee className="w-12 h-12 text-primary" />
               </div>
               <h2 className="text-2xl font-headline font-semibold">Where do you want to go?</h2>
-              <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
-                {quickPrompts.map((prompt) => (
-                  <Button key={prompt} variant="outline" className="h-auto whitespace-normal py-3 justify-center text-center font-body" onClick={() => handleSendMessage(prompt)}>
-                    {prompt}
-                  </Button>
-                ))}
-              </div>
+              {arePromptsLoading ? <QuickPromptSkeleton /> : (
+                <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
+                    {quickPrompts.map((prompt) => (
+                    <Button key={prompt} variant="outline" className="h-auto whitespace-normal py-3 justify-center text-center font-body" onClick={() => handleSendMessage(prompt)}>
+                        {prompt}
+                    </Button>
+                    ))}
+                </div>
+              )}
             </div>
           ) : (
             <div className="space-y-6">

@@ -17,13 +17,17 @@ const vibes = [
     { name: 'Cozy', color: 'bg-[hsl(var(--secondary))]', textColor: 'text-black', glow: 'shadow-[0_0_15px_hsl(var(--secondary))]' },
 ];
 
-const VibeStatus = () => {
-  const [currentVibe, setCurrentVibe] = useState('Relaxed');
+interface VibeStatusProps {
+    currentVibe: string;
+    onVibeChange: (vibe: string) => void;
+}
+
+const VibeStatus = ({ currentVibe, onVibeChange }: VibeStatusProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
 
   const handleSelectVibe = async (vibe: string) => {
-    setCurrentVibe(vibe);
+    onVibeChange(vibe);
     setOpen(false);
     
     toast({
