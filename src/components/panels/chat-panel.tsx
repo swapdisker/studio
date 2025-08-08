@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { CornerDownLeft, Bot, User, BrainCircuit } from 'lucide-react';
-import { generatePersonalizedRecommendations } from '@/ai/flows/generate-personalized-recommendations';
+import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
 
@@ -24,10 +24,10 @@ const quickPrompts = [
 ];
 
 interface ChatPanelProps {
-  onSelectDestination: (id: number) => void;
+  onNewRecommendation: (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => void;
 }
 
-const ChatPanel = ({ onSelectDestination }: ChatPanelProps) => {
+const ChatPanel = ({ onNewRecommendation }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -52,9 +52,20 @@ const ChatPanel = ({ onSelectDestination }: ChatPanelProps) => {
       const result = await generatePersonalizedRecommendations({
         query: userMessage
       });
-      setMessages((prev) => [...prev, { role: 'assistant', content: result.recommendations }]);
+
+      if (result.recommendations && result.recommendations.length > 0) {
+        onNewRecommendation(result.recommendations[0]);
+        const assistantMessage = `I found a few places for you. I've put the top result, ${result.recommendations[0].name}, on the map. \n\nHere are some other options:\n${result.recommendations.slice(1).map(r => `- ${r.name}`).join('\n')}`;
+        setMessages((prev) => [...prev, { role: 'assistant', content: assistantMessage }]);
+
+      } else {
+        onNewRecommendation(null);
+        setMessages((prev) => [...prev, { role: 'assistant', content: "I couldn't find any recommendations for that. Try something else!" }]);
+      }
+
     } catch (error) {
       console.error(error);
+      onNewRecommendation(null);
       setMessages((prev) => [...prev, { role: 'assistant', content: "I'm sorry, I couldn't fetch recommendations right now. Please try again later." }]);
       toast({
         variant: "destructive",
@@ -83,7 +94,7 @@ const ChatPanel = ({ onSelectDestination }: ChatPanelProps) => {
               <h2 className="text-2xl font-headline font-semibold">How can I help you today?</h2>
               <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
                 {quickPrompts.map((prompt) => (
-                  <Button key={prompt} variant="outline" className="font-body h-auto py-3 whitespace-normal justify-center text-center" onClick={() => handleSendMessage(prompt)}>
+                  <Button key={prompt} variant="outline" className="h-auto whitespace-normal py-3 justify-center text-center font-body" onClick={() => handleSendMessage(prompt)}>
                     {prompt}
                   </Button>
                 ))}

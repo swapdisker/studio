@@ -16,8 +16,19 @@ const GeneratePersonalizedRecommendationsInputSchema = z.object({
 });
 export type GeneratePersonalizedRecommendationsInput = z.infer<typeof GeneratePersonalizedRecommendationsInputSchema>;
 
+const RecommendationSchema = z.object({
+    name: z.string().describe("The name of the recommended place or event."),
+    description: z.string().describe("A brief description of the recommendation."),
+    weather: z.object({
+        temp: z.number().describe("The temperature in Celsius."),
+        condition: z.enum(['sunny', 'cloudy', 'rainy']).describe("The weather condition."),
+    }).describe("The weather at the recommended location."),
+    traffic: z.string().optional().describe("The current traffic conditions to the location (e.g., 'light', 'moderate', 'heavy')."),
+    busyness: z.string().optional().describe("How busy the location is currently (e.g., 'not busy', 'moderately busy', 'very busy')."),
+});
+
 const GeneratePersonalizedRecommendationsOutputSchema = z.object({
-  recommendations: z.string().describe('A list of personalized recommendations for nearby activities and places.'),
+  recommendations: z.array(RecommendationSchema).describe('A list of personalized recommendations for nearby activities and places.'),
 });
 export type GeneratePersonalizedRecommendationsOutput = z.infer<typeof GeneratePersonalizedRecommendationsOutputSchema>;
 
@@ -33,7 +44,12 @@ const prompt = ai.definePrompt({
 
 The user's request is: {{{query}}}
 
-Based on the user's request, provide a list of personalized recommendations for nearby activities and places. Be concise and provide a variety of options. Use the available tools to find real events and venues.`,
+Based on the user's request, provide a list of personalized recommendations for nearby activities and places. 
+- For each recommendation, provide a name, description, and fake but realistic weather. 
+- For traffic and busyness, you can leave them as "unknown" for now.
+- Use the available tools to find real events and venues if the user asks for something specific like "concerts".
+- Return at least 3 recommendations.
+- Be creative and provide interesting options.`,
   tools: [getEventbriteEvents],
 });
 

@@ -6,6 +6,7 @@ import HappeningNowPanel from '@/components/panels/happening-now-panel';
 import DestinationPanel from '@/components/panels/destination-panel';
 import ChatPanel from '@/components/panels/chat-panel';
 import Header from '@/components/layout/header';
+import { GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 
 export interface Destination {
   id: number;
@@ -39,22 +40,38 @@ const mockDestinations: Destination[] = [
 ];
 
 const WanderWiseClient: FC = () => {
-  const [selectedDestination, setSelectedDestination] = useState<Destination | null>(null);
+  const [selectedDestination, setSelectedDestination] = useState<GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null>(null);
 
-  const handleSelectDestination = (destinationId: number) => {
+  const handleNewRecommendation = (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => {
+    setSelectedDestination(recommendation);
+  };
+
+  const handleSelectMockDestination = (destinationId: number) => {
     const dest = mockDestinations.find(d => d.id === destinationId);
-    setSelectedDestination(dest || null);
+    if (dest) {
+        const recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] = {
+            name: dest.name,
+            description: dest.description,
+            weather: {
+                temp: dest.weather.temp,
+                condition: dest.weather.condition
+            },
+            traffic: "unknown",
+            busyness: "unknown",
+        };
+        setSelectedDestination(recommendation);
+    }
   };
   
   return (
     <div className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       <Header />
       <main className="flex flex-1 overflow-hidden p-4 gap-4">
-        <HappeningNowPanel onSelectDestination={handleSelectDestination} />
+        <HappeningNowPanel onSelectDestination={handleSelectMockDestination} />
         <div className={`transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
-        <ChatPanel onSelectDestination={handleSelectDestination}/>
+        <ChatPanel onNewRecommendation={handleNewRecommendation}/>
       </main>
     </div>
   );
