@@ -11,10 +11,7 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GeneratePersonalizedRecommendationsInputSchema = z.object({
-  location: z.string().describe('The current location of the user.'),
-  weather: z.string().describe('The current weather conditions at the user\'s location.'),
-  preferences: z.string().describe('The user\'s stated preferences from the initial setup.'),
-  learnedPreferences: z.string().describe('The user\'s inferred preferences learned over time.'),
+  query: z.string().describe('The user\'s request for recommendations.'),
 });
 export type GeneratePersonalizedRecommendationsInput = z.infer<typeof GeneratePersonalizedRecommendationsInputSchema>;
 
@@ -31,7 +28,11 @@ const prompt = ai.definePrompt({
   name: 'generatePersonalizedRecommendationsPrompt',
   input: {schema: GeneratePersonalizedRecommendationsInputSchema},
   output: {schema: GeneratePersonalizedRecommendationsOutputSchema},
-  prompt: `You are a personal assistant that provides personalized recommendations for nearby activities and places based on the user\'s current location, the weather, their stated preferences from the initial setup, and their inferred preferences learned over time.\n\nCurrent Location: {{{location}}}\nWeather: {{{weather}}}\nPreferences: {{{preferences}}}\nLearned Preferences: {{{learnedPreferences}}}\n\nProvide a list of personalized recommendations for nearby activities and places. Consider the weather, the user's preferences, and the learned preferences when generating the recommendations. Be concise and provide a variety of options.\n`,
+  prompt: `You are a personal assistant that provides personalized recommendations for nearby activities and places.
+
+The user's request is: {{{query}}}
+
+Based on the user's request, provide a list of personalized recommendations for nearby activities and places. Be concise and provide a variety of options.`,
 });
 
 const generatePersonalizedRecommendationsFlow = ai.defineFlow(

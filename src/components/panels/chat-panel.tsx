@@ -50,10 +50,7 @@ const ChatPanel = ({ onSelectDestination }: ChatPanelProps) => {
 
     try {
       const result = await generatePersonalizedRecommendations({
-        location: "New York, NY",
-        weather: "Clear skies, 23°C",
-        preferences: "Likes modern art, jazz music, and Italian food.",
-        learnedPreferences: "Often visits parks on sunny weekends and prefers less crowded places."
+        query: userMessage
       });
       setMessages((prev) => [...prev, { role: 'assistant', content: result.recommendations }]);
     } catch (error) {
