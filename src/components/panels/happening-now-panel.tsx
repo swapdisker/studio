@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import VibeStatus from '@/components/common/vibe-status';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import CalendarEventsPopover from '@/components/common/calendar-events-popover';
 import { getCalendlyEvents, CalendlyEvent } from '@/ai/tools/calendly';
@@ -13,33 +13,35 @@ interface HappeningNowPanelProps {
   onSelectDestination: (id: number) => void;
   currentVibe: string;
   onVibeChange: (vibe: string) => void;
+  refreshEventsTrigger: boolean;
 }
 
-const HappeningNowPanel = ({ onSelectDestination, currentVibe, onVibeChange }: HappeningNowPanelProps) => {
+const HappeningNowPanel = ({ onSelectDestination, currentVibe, onVibeChange, refreshEventsTrigger }: HappeningNowPanelProps) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
     const [events, setEvents] = useState<Record<string, CalendlyEvent[]>>({});
 
-    useEffect(() => {
-        async function fetchEvents() {
-            try {
-                const calendlyEvents = await getCalendlyEvents();
-                const eventsByDate: Record<string, CalendlyEvent[]> = {};
-                calendlyEvents.forEach(event => {
-                    const dateStr = new Date(event.start_time).toISOString().split('T')[0];
-                    if (!eventsByDate[dateStr]) {
-                        eventsByDate[dateStr] = [];
-                    }
-                    eventsByDate[dateStr].push(event);
-                });
-                setEvents(eventsByDate);
-            } catch (error) {
-                console.error("Failed to fetch Calendly events", error);
-            }
+    const fetchEvents = useCallback(async () => {
+        try {
+            const calendlyEvents = await getCalendlyEvents();
+            const eventsByDate: Record<string, CalendlyEvent[]> = {};
+            calendlyEvents.forEach(event => {
+                const dateStr = new Date(event.start_time).toISOString().split('T')[0];
+                if (!eventsByDate[dateStr]) {
+                    eventsByDate[dateStr] = [];
+                }
+                eventsByDate[dateStr].push(event);
+            });
+            setEvents(eventsByDate);
+        } catch (error) {
+            console.error("Failed to fetch Calendly events", error);
         }
-        fetchEvents();
     }, []);
+
+    useEffect(() => {
+        fetchEvents();
+    }, [fetchEvents, refreshEventsTrigger]);
 
     const getEventCountForDate = (date: Date) => {
         const dateString = date.toISOString().split('T')[0];

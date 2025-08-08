@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { FC } from 'react';
 import HappeningNowPanel from '@/components/panels/happening-now-panel';
 import DestinationPanel from '@/components/panels/destination-panel';
@@ -52,6 +52,7 @@ const WanderWiseClient: FC = () => {
   const [location, setLocation] = useState<Location | null>(null);
   const [currentVibe, setCurrentVibe] = useState('Relaxed');
   const [animationClass, setAnimationClass] = useState('');
+  const [refreshEvents, setRefreshEvents] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -138,6 +139,10 @@ const WanderWiseClient: FC = () => {
         setAnimationClass('');
     }, 700);
   }
+
+  const handleEventScheduled = useCallback(() => {
+    setRefreshEvents(prev => !prev);
+  }, []);
   
   return (
     <div id="root-container" className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
@@ -147,10 +152,11 @@ const WanderWiseClient: FC = () => {
             onSelectDestination={handleSelectMockDestination} 
             currentVibe={currentVibe}
             onVibeChange={handleVibeChange}
+            refreshEventsTrigger={refreshEvents}
           />
         </div>
         <div className={`row-span-2 transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
-           {selectedDestination && <DestinationPanel destination={selectedDestination} />}
+           {selectedDestination && <DestinationPanel destination={selectedDestination} onEventScheduled={handleEventScheduled} />}
         </div>
         <div className={`col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border ${animationClass}`}>
             <Header location={location} />

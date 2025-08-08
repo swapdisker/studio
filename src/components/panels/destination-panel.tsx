@@ -11,9 +11,10 @@ import { format } from 'date-fns';
 
 interface DestinationPanelProps {
   destination: GeneratePersonalizedRecommendationsOutput['recommendations'][0];
+  onEventScheduled: () => void;
 }
 
-const DestinationPanel = ({ destination }: DestinationPanelProps) => {
+const DestinationPanel = ({ destination, onEventScheduled }: DestinationPanelProps) => {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY_HERE";
   const { toast } = useToast();
   const [isScheduling, setIsScheduling] = useState(false);
@@ -34,6 +35,7 @@ const DestinationPanel = ({ destination }: DestinationPanelProps) => {
           title: 'Event Scheduled!',
           description: `${destination.name} has been added to your Calendly for ${format(scheduledDate, "MMMM d, yyyy 'at' h:mm a")}.`,
         });
+        onEventScheduled();
       } else {
         throw new Error(result.message);
       }
