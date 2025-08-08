@@ -25,7 +25,7 @@ const quickPrompts = [
 ];
 
 interface ChatPanelProps {
-  onNewRecommendation: (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => void;
+  onNewRecommendation: (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null, city?: string) => void;
   location: Location | null;
 }
 
@@ -58,7 +58,7 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
       });
 
       if (result.recommendations && result.recommendations.length > 0) {
-        onNewRecommendation(result.recommendations[0]);
+        onNewRecommendation(result.recommendations[0], result.city);
         const assistantMessage = `I found a few places for you. I've put the top result, ${result.recommendations[0].name}, on the map. \n\nHere are some other options:\n${result.recommendations.slice(1).map(r => `- ${r.name}`).join('\n')}`;
         setMessages((prev) => [...prev, { role: 'assistant', content: assistantMessage }]);
 
@@ -87,8 +87,8 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
   };
 
   return (
-    <Card className="flex-1 flex flex-col h-full rounded-none border-none shadow-none bg-transparent">
-      <CardContent className="flex-1 flex flex-col p-4 gap-4 h-full">
+    <Card className="flex-1 flex flex-col h-full rounded-none border-none shadow-none bg-transparent overflow-hidden">
+      <CardContent className="flex-1 flex flex-col p-4 gap-4 h-full overflow-hidden">
         <ScrollArea className="flex-1 pr-4" viewportRef={scrollViewportRef}>
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
@@ -115,6 +115,7 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
                   )}
                   <div className={cn('rounded-lg p-3 max-w-md shadow-sm', message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-card border')}>
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
                   </div>
                   {message.role === 'user' && (
                     <Avatar className="w-8 h-8 flex-shrink-0">

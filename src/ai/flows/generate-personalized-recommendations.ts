@@ -30,6 +30,7 @@ const RecommendationSchema = z.object({
 });
 
 const GeneratePersonalizedRecommendationsOutputSchema = z.object({
+  city: z.string().optional().describe("The user's city, derived from the provided latitude and longitude."),
   recommendations: z.array(RecommendationSchema).describe('A list of personalized recommendations for nearby activities and places.'),
 });
 export type GeneratePersonalizedRecommendationsOutput = z.infer<typeof GeneratePersonalizedRecommendationsOutputSchema>;
@@ -45,7 +46,7 @@ const prompt = ai.definePrompt({
   prompt: `You are a personal assistant that provides personalized recommendations for nearby activities and places.
 
 The user's request is: {{{query}}}
-{{#if latitude}}The user is at latitude: {{{latitude}}} and longitude: {{{longitude}}}.{{/if}}
+{{#if latitude}}The user is at latitude: {{{latitude}}} and longitude: {{{longitude}}}. Based on these coordinates, determine the user's city and populate the 'city' field in the output.{{/if}}
 
 Based on the user's request and location (if provided), provide a list of personalized recommendations for nearby activities and places.
 - For each recommendation, provide a name, description, and fake but realistic weather. 

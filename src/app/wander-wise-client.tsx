@@ -6,7 +6,7 @@ import HappeningNowPanel from '@/components/panels/happening-now-panel';
 import DestinationPanel from '@/components/panels/destination-panel';
 import ChatPanel from '@/components/panels/chat-panel';
 import Header from '@/components/layout/header';
-import { GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
+import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 import { useToast } from '@/hooks/use-toast';
 
 export interface Destination {
@@ -24,6 +24,7 @@ export interface Destination {
 export interface Location {
     latitude: number;
     longitude: number;
+    city?: string;
 }
 
 const mockDestinations: Destination[] = [
@@ -54,10 +55,25 @@ const WanderWiseClient: FC = () => {
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setLocation({
+          const newLocation: Location = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
+          };
+          setLocation(newLocation);
+          
+          // Eagerly fetch city from a simple query.
+          generatePersonalizedRecommendations({
+            query: "What city is this?",
+            latitude: newLocation.latitude,
+            longitude: newLocation.longitude,
+          }).then(result => {
+            if (result.city) {
+              setLocation(prevLocation => prevLocation ? {...prevLocation, city: result.city} : null);
+            }
+          }).catch(error => {
+            console.error("Error fetching city:", error);
           });
+
         },
         (error) => {
           console.error("Geolocation error:", error);
@@ -78,8 +94,11 @@ const WanderWiseClient: FC = () => {
   }, [toast]);
 
 
-  const handleNewRecommendation = (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => {
+  const handleNewRecommendation = (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null, city?: string) => {
     setSelectedDestination(recommendation);
+    if (city && location && !location.city) {
+        setLocation(prevLocation => prevLocation ? {...prevLocation, city: city} : null);
+    }
   };
 
   const handleSelectMockDestination = (destinationId: number) => {
@@ -109,8 +128,8 @@ const WanderWiseClient: FC = () => {
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
         <div className="col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border">
-            <Header location={location} />
-            <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} />
+          <Header location={location} />
+          <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} />
         </div>
       </main>
     </div>

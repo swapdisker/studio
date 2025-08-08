@@ -9,15 +9,20 @@ interface HeaderProps {
 
 const Header: FC<HeaderProps> = ({ location }) => {
   return (
-    <header className="flex items-center justify-between p-4 border-b bg-card">
+    <header className="flex items-center justify-between p-4 border-b bg-card flex-shrink-0">
       <div className="flex items-center gap-4">
         <h1 className="text-2xl font-headline font-bold text-primary">Talk2GO</h1>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <MapPin className="w-4 h-4 text-primary" />
             {location ? (
-                <span>
-                    {location.latitude.toFixed(3)}, {location.longitude.toFixed(3)}
-                </span>
+                <div className="flex items-baseline gap-2">
+                    <span>
+                        {location.latitude.toFixed(3)}, {location.longitude.toFixed(3)}
+                    </span>
+                    {location.city && (
+                        <span className="text-xs text-muted-foreground/80">{location.city}</span>
+                    )}
+                </div>
             ) : (
                 <span>Getting location...</span>
             )}
