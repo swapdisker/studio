@@ -130,17 +130,17 @@ const WanderWiseClient: FC = () => {
     const vibeDetails = vibes.find(v => v.name === newVibe);
     if (vibeDetails) {
         const colorHsl = getComputedStyle(document.documentElement).getPropertyValue(`--chart-${vibeDetails.color.match(/(\d+)/)?.[0] || '1'}`).trim();
-        document.documentElement.style.setProperty('--vibe-wave-color', `hsl(${colorHsl})`);
+        document.documentElement.style.setProperty('--vibe-flash-color', `hsla(${colorHsl}, 0.2)`);
     }
 
-    setAnimationClass('vibe-wave-active');
+    setAnimationClass('vibe-flash-active');
     setTimeout(() => {
         setAnimationClass('');
     }, 700);
   }
   
   return (
-    <div id="root-container" className={`flex flex-col h-screen bg-background text-foreground overflow-hidden ${animationClass}`}>
+    <div id="root-container" className="flex flex-col h-screen bg-background text-foreground overflow-hidden">
       <main className="grid grid-cols-[auto,auto,1fr] flex-1 overflow-hidden p-4 gap-4">
         <div className="row-span-2">
           <HappeningNowPanel 
@@ -152,7 +152,7 @@ const WanderWiseClient: FC = () => {
         <div className={`row-span-2 transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
-        <div className="col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border">
+        <div className={`col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border ${animationClass}`}>
             <Header location={location} />
             <div className="flex-1 flex flex-col overflow-hidden">
                 <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} vibe={currentVibe} />

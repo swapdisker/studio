@@ -33,7 +33,7 @@ body {
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
     --radius: 0.75rem;
-    --vibe-wave-color: transparent;
+    --vibe-flash-color: transparent;
   }
   .dark {
     --background: 222 84% 4.9%;
@@ -72,17 +72,16 @@ body {
   }
 }
 
-@keyframes vibe-wave-animation {
-  0% {
-    box-shadow: inset 0 0 0 0px var(--vibe-wave-color);
-    opacity: 1;
+@keyframes vibe-flash-animation {
+  0%, 100% {
+    background-color: transparent;
   }
-  100% {
-    box-shadow: inset 0 0 0 100vw var(--vibe-wave-color);
-    opacity: 0;
+  50% {
+    background-color: var(--vibe-flash-color);
   }
 }
 
-.vibe-wave-active {
-    animation: vibe-wave-animation 0.7s ease-out forwards;
+
+.vibe-flash-active {
+    animation: vibe-flash-animation 0.7s ease-in-out;
 }
