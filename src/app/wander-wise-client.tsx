@@ -129,8 +129,8 @@ const WanderWiseClient: FC = () => {
     setCurrentVibe(newVibe);
     const vibeDetails = vibes.find(v => v.name === newVibe);
     if (vibeDetails) {
-        const colorHsl = getComputedStyle(document.documentElement).getPropertyValue(`--chart-${vibeDetails.color.match(/(\d+)/)?.[0] || '1'}`).trim();
-        document.documentElement.style.setProperty('--vibe-flash-color', `hsla(${colorHsl}, 0.2)`);
+        const chartColorVar = `hsl(var(--chart-${vibeDetails.color.match(/(\d+)/)?.[0] || '1'}))`;
+        document.documentElement.style.setProperty('--vibe-flash-color', chartColorVar);
     }
 
     setAnimationClass('vibe-flash-active');
