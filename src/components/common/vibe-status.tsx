@@ -9,12 +9,12 @@ import { Sparkles, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const vibes = [
-    { name: 'Energetic', color: 'bg-[hsl(var(--chart-1))]', textColor: 'text-white' },
-    { name: 'Relaxed', color: 'bg-[hsl(var(--chart-2))]', textColor: 'text-white' },
-    { name: 'Adventurous', color: 'bg-[hsl(var(--chart-5))]', textColor: 'text-white' },
-    { name: 'Creative', color: 'bg-[hsl(var(--chart-4))]', textColor: 'text-black' },
-    { name: 'Social', color: 'bg-[hsl(var(--primary))]', textColor: 'text-white' },
-    { name: 'Cozy', color: 'bg-[hsl(var(--secondary))]', textColor: 'text-black' },
+    { name: 'Energetic', color: 'bg-[hsl(var(--chart-1))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-1))]' },
+    { name: 'Relaxed', color: 'bg-[hsl(var(--chart-2))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-2))]' },
+    { name: 'Adventurous', color: 'bg-[hsl(var(--chart-5))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--chart-5))]' },
+    { name: 'Creative', color: 'bg-[hsl(var(--chart-4))]', textColor: 'text-black', glow: 'shadow-[0_0_15px_hsl(var(--chart-4))]' },
+    { name: 'Social', color: 'bg-[hsl(var(--primary))]', textColor: 'text-white', glow: 'shadow-[0_0_15px_hsl(var(--primary))]' },
+    { name: 'Cozy', color: 'bg-[hsl(var(--secondary))]', textColor: 'text-black', glow: 'shadow-[0_0_15px_hsl(var(--secondary))]' },
 ];
 
 const VibeStatus = () => {
@@ -55,8 +55,8 @@ const VibeStatus = () => {
         <Button 
             variant="outline" 
             className={cn(
-                "w-full justify-start font-normal text-base py-6",
-                selectedVibe ? `${selectedVibe.color} ${selectedVibe.textColor} hover:${selectedVibe.color}/90 focus:${selectedVibe.color}` : ""
+                "w-full justify-start font-normal text-base py-6 transition-all duration-300",
+                selectedVibe ? `${selectedVibe.color} ${selectedVibe.textColor} hover:${selectedVibe.color}/90 focus:${selectedVibe.color} ${selectedVibe.glow}` : ""
             )}
         >
           <Sparkles className="mr-2 h-4 w-4" />
