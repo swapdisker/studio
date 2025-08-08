@@ -7,6 +7,7 @@ import { TrafficCone, Users, CalendarPlus } from 'lucide-react';
 import { scheduleEvent } from '@/ai/tools/calendly';
 import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
+import { format } from 'date-fns';
 
 interface DestinationPanelProps {
   destination: GeneratePersonalizedRecommendationsOutput['recommendations'][0];
@@ -27,10 +28,11 @@ const DestinationPanel = ({ destination }: DestinationPanelProps) => {
     });
     try {
       const result = await scheduleEvent(destination.name, destination.description);
-      if (result.success) {
+      if (result.success && result.scheduledTime) {
+        const scheduledDate = new Date(result.scheduledTime);
         toast({
           title: 'Event Scheduled!',
-          description: `${destination.name} has been added to your Calendly.`,
+          description: `${destination.name} has been added to your Calendly for ${format(scheduledDate, "MMMM d, yyyy 'at' h:mm a")}.`,
         });
       } else {
         throw new Error(result.message);

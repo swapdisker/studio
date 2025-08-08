@@ -1,7 +1,7 @@
 'use server';
 
 import { z } from 'zod';
-import { addHours, formatISO, parseISO } from 'date-fns';
+import { addHours, format, formatISO, parseISO } from 'date-fns';
 
 const CalendlyEventSchema = z.object({
   uri: z.string(),
@@ -49,7 +49,7 @@ export async function getCalendlyEvents(): Promise<CalendlyEvent[]> {
   }));
 }
 
-export async function scheduleEvent(name: string, description: string): Promise<{ success: boolean, message: string }> {
+export async function scheduleEvent(name: string, description: string): Promise<{ success: boolean; message: string; scheduledTime?: string }> {
     // This function simulates finding the next available slot and creating an event.
     // The previous implementation was hitting a "Resource Not Found" error because
     // the Calendly API for creating one-off scheduling links is complex and the
@@ -90,9 +90,10 @@ export async function scheduleEvent(name: string, description: string): Promise<
             nextAvailableSlot.setHours(9, 0, 0, 0);
         }
 
-        console.log(`Simulating scheduling for: ${name} at ${formatISO(nextAvailableSlot)}`);
+        const scheduledTime = formatISO(nextAvailableSlot);
+        console.log(`Simulating scheduling for: ${name} at ${scheduledTime}`);
         
-        return { success: true, message: `Event '${name}' scheduled successfully.` };
+        return { success: true, message: `Event '${name}' scheduled successfully.`, scheduledTime: scheduledTime };
 
     } catch (error) {
         const errorMessage = error instanceof Error ? error.message : "An unknown error occurred while checking calendar.";
