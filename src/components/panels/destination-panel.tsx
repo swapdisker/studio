@@ -1,8 +1,12 @@
+'use client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import WeatherWidget from '@/components/common/weather-widget';
 import type { GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
-import { TrafficCone, Users } from 'lucide-react';
+import { TrafficCone, Users, CalendarPlus } from 'lucide-react';
+import { scheduleEvent } from '@/ai/tools/calendly';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
 
 interface DestinationPanelProps {
   destination: GeneratePersonalizedRecommendationsOutput['recommendations'][0];
@@ -10,8 +14,39 @@ interface DestinationPanelProps {
 
 const DestinationPanel = ({ destination }: DestinationPanelProps) => {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "YOUR_API_KEY_HERE";
+  const { toast } = useToast();
+  const [isScheduling, setIsScheduling] = useState(false);
   
   const mapSrc = `https://www.google.com/maps/embed/v1/place?key=${apiKey}&q=${encodeURIComponent(destination.name)}`;
+
+  const handleSchedule = async () => {
+    setIsScheduling(true);
+    toast({
+      title: 'Scheduling...',
+      description: `Finding the next available slot for ${destination.name}.`,
+    });
+    try {
+      const result = await scheduleEvent(destination.name, destination.description);
+      if (result.success) {
+        toast({
+          title: 'Event Scheduled!',
+          description: `${destination.name} has been added to your Calendly.`,
+        });
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+      toast({
+        variant: "destructive",
+        title: "Scheduling Failed",
+        description: errorMessage,
+      });
+    } finally {
+        setIsScheduling(false);
+    }
+  };
 
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden">
@@ -39,7 +74,10 @@ const DestinationPanel = ({ destination }: DestinationPanelProps) => {
             </div>
         </div>
         <p className="text-sm text-foreground flex-grow">{destination.description}</p>
-        <Button className="w-full mt-auto font-headline">Go</Button>
+        <Button className="w-full mt-auto font-headline" onClick={handleSchedule} disabled={isScheduling}>
+            <CalendarPlus className="mr-2 h-4 w-4" />
+            {isScheduling ? 'Scheduling...' : 'Schedule to Calendar'}
+        </Button>
       </CardContent>
     </Card>
   );
