@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { CornerDownLeft, Bot, User, BrainCircuit } from 'lucide-react';
+import { CornerDownLeft, Bot, User, Coffee } from 'lucide-react';
 import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
@@ -93,7 +93,7 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="p-4 bg-primary/10 rounded-full mb-4">
-                <BrainCircuit className="w-12 h-12 text-primary" />
+                <Coffee className="w-12 h-12 text-primary" />
               </div>
               <h2 className="text-2xl font-headline font-semibold">Where do you want to go?</h2>
               <div className="grid grid-cols-2 gap-2 mt-6 w-full max-w-md">
