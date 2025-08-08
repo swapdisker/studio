@@ -109,7 +109,7 @@ const WanderWiseClient: FC = () => {
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
         <div className="col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border">
-            <Header />
+            <Header location={location} />
             <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} />
         </div>
       </main>
