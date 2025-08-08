@@ -14,7 +14,7 @@ const DestinationPanel = ({ destination }: DestinationPanelProps) => {
 
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden">
-      <div className="relative w-full h-64 flex-shrink-0">
+      <div className="relative w-full h-96 flex-shrink-0">
         <iframe
           width="100%"
           height="100%"
