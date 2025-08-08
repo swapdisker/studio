@@ -62,24 +62,24 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
         <CardContent className="flex flex-col gap-4 flex-grow">
           <div className="space-y-3">
             <button onClick={() => onSelectDestination(1)} className="w-full text-left" aria-label="Select Art & Culture event">
-              <Card className="hover:bg-secondary transition-colors">
+              <Card className="bg-[hsl(var(--chart-2))] text-white hover:bg-[hsl(var(--chart-2))]/90 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between p-4">
                   <div>
                     <CardTitle className="text-lg font-headline">Art &amp; Culture</CardTitle>
-                    <CardDescription>Visit the Museum of Modern Art</CardDescription>
+                    <CardDescription className="text-white/80">Visit the Museum of Modern Art</CardDescription>
                   </div>
-                  <ChevronsRight className="text-muted-foreground" />
+                  <ChevronsRight />
                 </CardHeader>
               </Card>
             </button>
             <button onClick={() => onSelectDestination(2)} className="w-full text-left" aria-label="Select Outdoor Fun event">
-              <Card className="hover:bg-secondary transition-colors">
+              <Card className="bg-[hsl(var(--chart-1))] text-white hover:bg-[hsl(var(--chart-1))]/90 transition-colors">
                 <CardHeader className="flex flex-row items-center justify-between p-4">
                   <div>
                     <CardTitle className="text-lg font-headline">Outdoor Fun</CardTitle>
-                    <CardDescription>Live music at the park</CardDescription>
+                    <CardDescription className="text-white/80">Live music at the park</CardDescription>
                   </div>
-                  <ChevronsRight className="text-muted-foreground" />
+                  <ChevronsRight />
                 </CardHeader>
               </Card>
             </button>
