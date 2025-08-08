@@ -108,7 +108,7 @@ const WanderWiseClient: FC = () => {
         <div className={`row-span-2 transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
-        <div className="col-start-3 row-span-2 flex flex-col overflow-hidden">
+        <div className="col-start-3 row-span-2 flex flex-col overflow-hidden rounded-lg border">
             <Header />
             <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} />
         </div>
