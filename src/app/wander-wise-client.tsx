@@ -52,6 +52,11 @@ const WanderWiseClient: FC = () => {
   const { toast } = useToast();
 
   useEffect(() => {
+    toast({
+      title: "Welcome!",
+      description: "Ready to find your next adventure?",
+    });
+
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
