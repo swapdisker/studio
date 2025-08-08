@@ -13,6 +13,8 @@ import { getEventbriteEvents } from '../tools/eventbrite';
 
 const GeneratePersonalizedRecommendationsInputSchema = z.object({
   query: z.string().describe('The user\'s request for recommendations.'),
+  latitude: z.number().optional().describe("The user's latitude."),
+  longitude: z.number().optional().describe("The user's longitude."),
 });
 export type GeneratePersonalizedRecommendationsInput = z.infer<typeof GeneratePersonalizedRecommendationsInputSchema>;
 
@@ -43,11 +45,14 @@ const prompt = ai.definePrompt({
   prompt: `You are a personal assistant that provides personalized recommendations for nearby activities and places.
 
 The user's request is: {{{query}}}
+{{#if latitude}}The user is at latitude: {{{latitude}}} and longitude: {{{longitude}}}.{{/if}}
 
-Based on the user's request, provide a list of personalized recommendations for nearby activities and places. 
+Based on the user's request and location (if provided), provide a list of personalized recommendations for nearby activities and places.
 - For each recommendation, provide a name, description, and fake but realistic weather. 
 - For traffic and busyness, you can leave them as "unknown" for now.
 - Use the available tools to find real events and venues if the user asks for something specific like "concerts".
+- If the user provides a location in their query, prioritize that over the latitude/longitude data.
+- If no location data is available at all, you can ask the user for their location.
 - Return at least 3 recommendations.
 - Be creative and provide interesting options.`,
   tools: [getEventbriteEvents],

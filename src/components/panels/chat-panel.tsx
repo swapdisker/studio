@@ -10,6 +10,7 @@ import { CornerDownLeft, Bot, User, BrainCircuit } from 'lucide-react';
 import { generatePersonalizedRecommendations, GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
 import { useToast } from "@/hooks/use-toast";
 import { cn } from '@/lib/utils';
+import type { Location } from '@/app/wander-wise-client';
 
 type Message = {
   role: 'user' | 'assistant';
@@ -25,9 +26,10 @@ const quickPrompts = [
 
 interface ChatPanelProps {
   onNewRecommendation: (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => void;
+  location: Location | null;
 }
 
-const ChatPanel = ({ onNewRecommendation }: ChatPanelProps) => {
+const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -50,7 +52,9 @@ const ChatPanel = ({ onNewRecommendation }: ChatPanelProps) => {
 
     try {
       const result = await generatePersonalizedRecommendations({
-        query: userMessage
+        query: userMessage,
+        latitude: location?.latitude,
+        longitude: location?.longitude
       });
 
       if (result.recommendations && result.recommendations.length > 0) {

@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { FC } from 'react';
 import HappeningNowPanel from '@/components/panels/happening-now-panel';
 import DestinationPanel from '@/components/panels/destination-panel';
 import ChatPanel from '@/components/panels/chat-panel';
 import Header from '@/components/layout/header';
 import { GeneratePersonalizedRecommendationsOutput } from '@/ai/flows/generate-personalized-recommendations';
+import { useToast } from '@/hooks/use-toast';
 
 export interface Destination {
   id: number;
@@ -18,6 +19,11 @@ export interface Destination {
     temp: number;
     condition: 'sunny' | 'cloudy' | 'rainy';
   };
+}
+
+export interface Location {
+    latitude: number;
+    longitude: number;
 }
 
 const mockDestinations: Destination[] = [
@@ -41,6 +47,40 @@ const mockDestinations: Destination[] = [
 
 const WanderWiseClient: FC = () => {
   const [selectedDestination, setSelectedDestination] = useState<GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null>(null);
+  const [location, setLocation] = useState<Location | null>(null);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
+          toast({
+            title: "Location Found",
+            description: "Your location will be used for recommendations.",
+          });
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          toast({
+            variant: "destructive",
+            title: "Location Access Denied",
+            description: "You can still manually provide your location in the chat.",
+          });
+        }
+      );
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Geolocation Not Supported",
+            description: "Your browser does not support geolocation.",
+        });
+    }
+  }, [toast]);
+
 
   const handleNewRecommendation = (recommendation: GeneratePersonalizedRecommendationsOutput['recommendations'][0] | null) => {
     setSelectedDestination(recommendation);
@@ -71,7 +111,7 @@ const WanderWiseClient: FC = () => {
         <div className={`transition-all duration-500 ease-in-out ${selectedDestination ? 'w-96' : 'w-0'} flex-shrink-0`}>
            {selectedDestination && <DestinationPanel destination={selectedDestination} />}
         </div>
-        <ChatPanel onNewRecommendation={handleNewRecommendation}/>
+        <ChatPanel onNewRecommendation={handleNewRecommendation} location={location} />
       </main>
     </div>
   );
