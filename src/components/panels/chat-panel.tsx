@@ -87,7 +87,7 @@ const ChatPanel = ({ onNewRecommendation, location }: ChatPanelProps) => {
   };
 
   return (
-    <Card className="flex-1 flex flex-col h-full">
+    <Card className="flex-1 flex flex-col h-full rounded-t-none">
       <CardContent className="flex-1 flex flex-col p-4 gap-4 h-full">
         <ScrollArea className="flex-1 pr-4" viewportRef={scrollViewportRef}>
           {messages.length === 0 ? (
