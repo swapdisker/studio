@@ -4,36 +4,45 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { Calendar } from '@/components/ui/calendar';
 import VibeStatus from '@/components/common/vibe-status';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import CalendarEventsPopover from '@/components/common/calendar-events-popover';
+import { getCalendlyEvents, CalendlyEvent } from '@/ai/tools/calendly';
 
 interface HappeningNowPanelProps {
   onSelectDestination: (id: number) => void;
-}
-
-const mockEvents = {
-  "2024-07-29": [{ time: "10:00 AM", title: "Team Standup" }, { time: "2:00 PM", title: "Design Review" }],
-  "2024-07-30": [],
-  "2024-08-01": [{ time: "11:00 AM", title: "Lunch with Sarah" }],
-  "2024-08-05": [
-    { time: "9:00 AM", title: "Project Kickoff" },
-    { time: "1:00 PM", title: "User Interview" },
-    { time: "4:00 PM", title: "Sync with Marketing" },
-    { time: "6:00 PM", title: "Yoga Class" }
-  ],
-  "2024-08-15": [{ time: "All Day", title: "Company Offsite" }],
-};
-
-const getEventCountForDate = (date: Date) => {
-    const dateString = date.toISOString().split('T')[0];
-    return mockEvents[dateString]?.length || 0;
 }
 
 const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [popoverOpen, setPopoverOpen] = useState(false);
     const [selectedDay, setSelectedDay] = useState<Date | undefined>(new Date());
+    const [events, setEvents] = useState<Record<string, CalendlyEvent[]>>({});
+
+    useEffect(() => {
+        async function fetchEvents() {
+            try {
+                const calendlyEvents = await getCalendlyEvents();
+                const eventsByDate: Record<string, CalendlyEvent[]> = {};
+                calendlyEvents.forEach(event => {
+                    const dateStr = new Date(event.start_time).toISOString().split('T')[0];
+                    if (!eventsByDate[dateStr]) {
+                        eventsByDate[dateStr] = [];
+                    }
+                    eventsByDate[dateStr].push(event);
+                });
+                setEvents(eventsByDate);
+            } catch (error) {
+                console.error("Failed to fetch Calendly events", error);
+            }
+        }
+        fetchEvents();
+    }, []);
+
+    const getEventCountForDate = (date: Date) => {
+        const dateString = date.toISOString().split('T')[0];
+        return events[dateString]?.length || 0;
+    }
 
     const handleDayClick = (day: Date) => {
         setSelectedDay(day);
@@ -52,6 +61,11 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
         free: { backgroundColor: '#90EE90' },
     };
 
+    const popoverEvents = selectedDay ? events[selectedDay.toISOString().split('T')[0]] || [] : [];
+    const formattedEvents = popoverEvents.map(e => ({
+        time: new Date(e.start_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        title: e.name
+    }));
 
   return (
     <div className="w-96 flex-shrink-0 flex flex-col gap-4">
@@ -103,7 +117,7 @@ const HappeningNowPanel = ({ onSelectDestination }: HappeningNowPanelProps) => {
                     </div>
                 </PopoverTrigger>
                 <PopoverContent className="w-80">
-                    <CalendarEventsPopover date={selectedDay} events={mockEvents[selectedDay?.toISOString().split('T')[0] || ''] || []} />
+                    <CalendarEventsPopover date={selectedDay} events={formattedEvents} />
                 </PopoverContent>
             </Popover>
           </div>
